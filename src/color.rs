@@ -50,6 +50,14 @@ impl ops::Add<Vec3> for Color {
     }
 }
 
+impl ops::AddAssign for Color {
+    fn add_assign(&mut self, other: Color) {
+        self.r += other.r;
+        self.g += other.g;
+        self.b += other.b;
+    }
+}
+
 impl ops::Mul for Color {
     type Output = Color;
 
