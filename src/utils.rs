@@ -3,12 +3,12 @@ use std::ops::Range;
 use rand::Rng;
 
 /// Generate a random `f64` between 0 and 1, 1 exluded
-fn random_f64() -> f64 {
+pub fn random_f64() -> f64 {
     let mut rng = rand::thread_rng();
     rng.gen_range(0_f64..1_f64)
 }
 
-fn random_f64_in(range: Range<f64>) -> f64 {
+pub fn random_f64_in(range: Range<f64>) -> f64 {
     let mut rng = rand::thread_rng();
     rng.gen_range(range)
 }
