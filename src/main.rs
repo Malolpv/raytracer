@@ -11,6 +11,7 @@ mod color;
 mod components;
 mod ray;
 mod scene;
+mod utils;
 mod vec3;
 mod world;
 
