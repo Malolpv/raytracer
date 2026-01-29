@@ -1,4 +1,4 @@
-use std::ops::Range;
+use std::ops::{Range, RangeInclusive};
 
 use crate::{
     color::Color,
@@ -36,7 +36,7 @@ impl Sphere {
 }
 
 impl Hitable for Sphere {
-    fn hit(&self, ray: &Ray, t_range: Range<f64>) -> Option<super::HitRecord> {
+    fn hit(&self, ray: &Ray, t_range: RangeInclusive<f64>) -> Option<super::HitRecord> {
         let oc: Vec3 = self.position - ray.origin();
 
         let a: f64 = ray.direction().length_squared();
