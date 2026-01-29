@@ -1,6 +1,6 @@
 pub mod sphere;
 
-use std::ops::Range;
+use std::ops::{Range, RangeInclusive};
 
 pub use sphere::Sphere;
 
@@ -51,7 +51,7 @@ impl HitRecord {
 }
 
 pub trait Hitable {
-    fn hit(&self, ray: &Ray, t_range: Range<f64>) -> Option<HitRecord>;
+    fn hit(&self, ray: &Ray, t_range: RangeInclusive<f64>) -> Option<HitRecord>;
 }
 
 pub enum Component {
@@ -62,7 +62,7 @@ pub enum Component {
 }
 
 impl Hitable for Component {
-    fn hit(&self, ray: &Ray, t_range: Range<f64>) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_range: RangeInclusive<f64>) -> Option<HitRecord> {
         match self {
             Self::Sphere(s) => s.hit(ray, t_range),
         }
