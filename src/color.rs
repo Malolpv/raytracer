@@ -15,9 +15,11 @@ impl Color {
     }
 
     pub fn write(out: &mut impl Write, pixel_color: &Color) {
-        let r_byte = (255.999 * pixel_color.r) as usize;
-        let g_byte = (255.999 * pixel_color.g) as usize;
-        let b_byte = (255.999 * pixel_color.b) as usize;
+        // Translate the [0,1] component values to the byte range [0,255].
+        const INTERVAL: ops::Range<f64> = 0_f64..0.999;
+        let r_byte: usize = (256_f64 * pixel_color.r.clamp(INTERVAL.start, INTERVAL.end)) as usize;
+        let g_byte: usize = (256_f64 * pixel_color.g.clamp(INTERVAL.start, INTERVAL.end)) as usize;
+        let b_byte: usize = (256_f64 * pixel_color.b.clamp(INTERVAL.start, INTERVAL.end)) as usize;
 
         // Just panic if anything breaks
         writeln!(out, "{r_byte} {g_byte} {b_byte}").unwrap();
