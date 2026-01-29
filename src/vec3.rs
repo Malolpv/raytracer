@@ -105,15 +105,6 @@ impl ops::Div<f64> for Vec3 {
     }
 }
 
-// impl ops::Div<Vec3> for f64 {
-//     type Output = Vec3;
-
-//     fn div(self, rhs: Vec3) -> Vec3 {
-//         // 'self' est ici le f64, 'rhs' est le Vec3
-//         Vec3::new(self / rhs.x, self / rhs.y, self / rhs.z)
-//     }
-// }
-
 // TODO maybe this isnt good
 impl ops::DivAssign<f64> for Vec3 {
     fn div_assign(&mut self, rhs: f64) {

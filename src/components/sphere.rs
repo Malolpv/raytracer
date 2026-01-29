@@ -2,7 +2,7 @@ use std::ops::Range;
 
 use crate::{
     color::Color,
-    components::{Component, Hitable},
+    components::Hitable,
     ray::Ray,
     vec3::{Point3, Vec3},
 };
