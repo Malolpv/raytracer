@@ -1,4 +1,6 @@
-use std::ops::{self};
+use std::ops::{self, Range};
+
+use crate::utils::{random_f64, random_f64_in};
 
 #[derive(Default, Debug, PartialEq, Clone, Copy)]
 pub struct Vec3 {
@@ -34,6 +36,19 @@ impl Vec3 {
 
     pub fn unit_vector(vec: &Self) -> Self {
         *vec / vec.length()
+    }
+
+    /// Instanciate a new vector with random values in range (0, 1]
+    pub fn random() -> Self {
+        Self::new(random_f64(), random_f64(), random_f64())
+    }
+
+    pub fn random_from_range(range: Range<f64>) -> Self {
+        Self::new(
+            random_f64_in(range.clone()),
+            random_f64_in(range.clone()),
+            random_f64_in(range),
+        )
     }
 }
 
