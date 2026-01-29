@@ -12,13 +12,13 @@ impl Hitable for World {
     fn hit(
         &self,
         ray: &crate::ray::Ray,
-        t_range: std::ops::Range<f64>,
+        t_range: std::ops::RangeInclusive<f64>,
     ) -> Option<crate::components::HitRecord> {
         let mut rec: Option<HitRecord> = None;
-        let mut closest_object: f64 = t_range.end;
+        let mut closest_object: f64 = *t_range.end();
 
         for object in &self.objects {
-            if let Some(hit) = object.hit(ray, t_range.start..closest_object) {
+            if let Some(hit) = object.hit(ray, *t_range.start()..=closest_object) {
                 closest_object = hit.t();
                 rec = Some(hit);
             }

@@ -114,7 +114,7 @@ impl Camera {
     }
 
     fn ray_color(ray: &Ray, world: &World) -> Color {
-        if let Some(hit) = world.hit(ray, 0_f64..f64::MAX) {
+        if let Some(hit) = world.hit(ray, 0_f64..=f64::MAX) {
             return (Color::new(1_f64, 1_f64, 1_f64) + hit.normal()) * 0.5;
         }
 
