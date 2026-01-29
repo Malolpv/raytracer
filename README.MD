@@ -64,8 +64,8 @@ src/
 1. **Clone the repository** 
 
 ```bash
-git clone
-cd 
+git clone https://github.com/Malolpv/raytracer.git
+cd raytracer
 ```
 
 2. **Build and Run in Release mode**
