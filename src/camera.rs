@@ -134,6 +134,8 @@ impl Camera {
             // Randomly generate a vector according to the Lambertian Distribution
             let direction: Vec3 = hit.normal() + Vec3::random_on_hemisphere(&hit.normal());
 
+            // here the float number represent the gamut applied to the ray color
+            // lower -> darker, higher -> clearer
             return Self::ray_color(&Ray::new(hit.position(), direction), depth - 1, world) * 0.5;
         }
 
