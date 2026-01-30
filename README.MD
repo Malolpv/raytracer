@@ -25,7 +25,7 @@ The project follows a modular design to ensure clarity and performance:
 * **Camera System**: Handles the mapping of the image grid to the 3D viewport, focal length, and ray generation.
 * **Geometry Management**: A `World` container that manages scene objects and implements efficient hit-detection loops.
 * **Primitive Intersections**: Optimized ray-sphere intersection logic using the quadratic formula and discriminant analysis.
-* **Parallelism**: Support for multi-threaded rendering across scanlines using the `Rayon` crate.
+* **Parallelism**: Support for multi-threaded rendering across scanlines using the [Rayon](https://docs.rs/rayon/latest/rayon/) crate.
 
 ## Technical Details
 
