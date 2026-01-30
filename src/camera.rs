@@ -12,14 +12,24 @@ pub struct CameraConfig {
     aspect_ratio: f64,
     image_width: usize,
     focal_lenght: f64,
+    max_depth: u8,
+    samples_per_pixel: usize,
 }
 
 impl CameraConfig {
-    pub fn new(aspect_ratio: f64, image_width: usize, focal_lenght: f64) -> Self {
+    pub fn new(
+        aspect_ratio: f64,
+        image_width: usize,
+        focal_lenght: f64,
+        samples_per_pixel: usize,
+        max_depth: u8,
+    ) -> Self {
         Self {
             aspect_ratio,
             image_width,
             focal_lenght,
+            max_depth,
+            samples_per_pixel,
         }
     }
 }
@@ -44,6 +54,8 @@ pub struct Camera {
     pixel00_loc: Point3,
     /// Camera center
     center: Point3,
+    /// Maximum number of ray bounces (smaller the depth -> darker the image)
+    max_depth: u8,
 }
 
 impl Camera {
@@ -81,8 +93,6 @@ impl Camera {
 
         let pixel00_loc: Point3 = viewport_upper_left_pixel + (pixel_delta_h + pixel_delta_v) * 0.5;
 
-        let samples_per_pixel: usize = 10;
-
         Camera {
             aspect_ratio: config.aspect_ratio,
             image_width: config.image_width,
@@ -91,8 +101,9 @@ impl Camera {
             pixel_delta_v,
             pixel00_loc,
             center: camera_center,
-            pixel_sample_scale: 1.0 / samples_per_pixel as f64,
-            samples_per_pixel,
+            pixel_sample_scale: 1.0 / config.samples_per_pixel as f64,
+            samples_per_pixel: config.samples_per_pixel,
+            max_depth: config.max_depth,
         }
     }
 
@@ -105,7 +116,7 @@ impl Camera {
 
                 for _sample in 0..self.samples_per_pixel {
                     let ray: Ray = self.get_ray(i, j);
-                    pixel_color += Self::ray_color(&ray, world);
+                    pixel_color += Self::ray_color(&ray, self.max_depth, world);
                 }
 
                 Color::write(&mut out, &(pixel_color * self.pixel_sample_scale));
@@ -113,9 +124,19 @@ impl Camera {
         }
     }
 
-    fn ray_color(ray: &Ray, world: &World) -> Color {
-        if let Some(hit) = world.hit(ray, 0_f64..=f64::MAX) {
-            return (Color::new(1_f64, 1_f64, 1_f64) + hit.normal()) * 0.5;
+    fn ray_color(ray: &Ray, depth: u8, world: &World) -> Color {
+        // If ray bounce limit is exceeded, no more light is gathered.
+        if depth == 0 {
+            return Color::white();
+        }
+
+        if let Some(hit) = world.hit(ray, 0.001..=f64::MAX) {
+            // Randomly generate a vector according to the Lambertian Distribution
+            let direction: Vec3 = hit.normal() + Vec3::random_on_hemisphere(&hit.normal());
+
+            // here the float number represent the gamut applied to the ray color
+            // lower -> darker, higher -> clearer
+            return Self::ray_color(&Ray::new(hit.position(), direction), depth - 1, world) * 0.5;
         }
 
         let unit_direction: Vec3 = Vec3::unit_vector(&ray.direction());

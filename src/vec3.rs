@@ -1,4 +1,6 @@
-use std::ops::{self};
+use std::ops::{self, Range};
+
+use crate::utils::{random_f64, random_f64_in};
 
 #[derive(Default, Debug, PartialEq, Clone, Copy)]
 pub struct Vec3 {
@@ -34,6 +36,40 @@ impl Vec3 {
 
     pub fn unit_vector(vec: &Self) -> Self {
         *vec / vec.length()
+    }
+
+    /// Instanciate a new vector with random values in range (0, 1]
+    pub fn random() -> Self {
+        Self::new(random_f64(), random_f64(), random_f64())
+    }
+
+    pub fn random_from_range(range: Range<f64>) -> Self {
+        Self::new(
+            random_f64_in(range.clone()),
+            random_f64_in(range.clone()),
+            random_f64_in(range),
+        )
+    }
+
+    pub fn random_unit_vector() -> Vec3 {
+        loop {
+            let p = Self::random();
+            let len_sq = p.length_squared();
+            if 1e-160 < len_sq && len_sq <= 1_f64 {
+                return p / len_sq.sqrt();
+            }
+        }
+    }
+
+    pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
+        let on_unit_sphere = Self::random_unit_vector();
+
+        if Self::dot(&on_unit_sphere, normal) > 0_f64 {
+            // In the same hemisphere as the normal
+            on_unit_sphere
+        } else {
+            -on_unit_sphere
+        }
     }
 }
 

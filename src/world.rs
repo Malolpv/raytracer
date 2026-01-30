@@ -38,32 +38,56 @@ impl World {
     pub fn add(&mut self, object: Component) {
         self.objects.push(object);
     }
+}
 
-    pub fn get_mock_world() -> World {
+pub enum MockWorld {
+    OneSphere,
+    BigAndSmallSpheres,
+}
+
+impl MockWorld {
+    pub fn get_mock_world(mock: MockWorld) -> World {
         eprintln!("Generating a mock world");
         let mut world = World::new();
+        match mock {
+            MockWorld::OneSphere => {
+                // Big middle sphere
+                world.add(Component::Sphere(Sphere::new(
+                    Point3::new(0.0, 0.0, -1.0),
+                    0.5,
+                    Color::new(1.0, 1.0, 0.0),
+                )));
 
-        // Medium left sphere
-        world.add(Component::Sphere(Sphere::new(
-            Point3::new(-0.5, 0.0, -1.0),
-            0.25,
-            Color::new(1.0, 1.0, 0.0),
-        )));
+                // Giant ground sphere
+                world.add(Component::Sphere(Sphere::new(
+                    Point3::new(0.0, -100.5, -1.0),
+                    100.0,
+                    Color::new(0.0, 0.0, 1.0),
+                )));
+            }
+            MockWorld::BigAndSmallSpheres => {
+                // Medium left sphere
+                world.add(Component::Sphere(Sphere::new(
+                    Point3::new(-0.5, 0.0, -1.0),
+                    0.25,
+                    Color::new(1.0, 1.0, 0.0),
+                )));
 
-        // Big right sphere
-        world.add(Component::Sphere(Sphere::new(
-            Point3::new(0.5, 0.0, -1.0),
-            0.5,
-            Color::new(1.0, 1.0, 0.0),
-        )));
+                // Big right sphere
+                world.add(Component::Sphere(Sphere::new(
+                    Point3::new(0.5, 0.0, -1.0),
+                    0.5,
+                    Color::new(1.0, 1.0, 0.0),
+                )));
 
-        // Big ground sphere
-        world.add(Component::Sphere(Sphere::new(
-            Point3::new(0.0, -100.5, -1.0),
-            100.0,
-            Color::new(0.0, 0.0, 1.0),
-        )));
-
+                // Big ground sphere
+                world.add(Component::Sphere(Sphere::new(
+                    Point3::new(0.0, -100.5, -1.0),
+                    100.0,
+                    Color::new(0.0, 0.0, 1.0),
+                )));
+            }
+        }
         world
     }
 }

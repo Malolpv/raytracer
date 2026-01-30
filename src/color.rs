@@ -14,12 +14,35 @@ impl Color {
         Self { r, g, b }
     }
 
+    pub fn white() -> Self {
+        Self {
+            r: 0_f64,
+            g: 0_f64,
+            b: 0_f64,
+        }
+    }
+
+    /// Apply a linear to gamma transform for gamma 2
+    pub fn linear_to_gamma(linear_component: f64) -> f64 {
+        if linear_component > 0_f64 {
+            return linear_component.sqrt();
+        }
+        0_f64
+    }
+
     pub fn write(out: &mut impl Write, pixel_color: &Color) {
         // Translate the [0,1] component values to the byte range [0,255].
         const INTERVAL: ops::Range<f64> = 0_f64..0.999;
-        let r_byte: usize = (256_f64 * pixel_color.r.clamp(INTERVAL.start, INTERVAL.end)) as usize;
-        let g_byte: usize = (256_f64 * pixel_color.g.clamp(INTERVAL.start, INTERVAL.end)) as usize;
-        let b_byte: usize = (256_f64 * pixel_color.b.clamp(INTERVAL.start, INTERVAL.end)) as usize;
+
+        // Applying gamma correction in order to have a consistent ramp from darkness to lightness
+        let r = Self::linear_to_gamma(pixel_color.r);
+        let g = Self::linear_to_gamma(pixel_color.g);
+        let b = Self::linear_to_gamma(pixel_color.b);
+
+        // convert to 8 bits values
+        let r_byte: u8 = (256_f64 * r.clamp(INTERVAL.start, INTERVAL.end)) as u8;
+        let g_byte: u8 = (256_f64 * g.clamp(INTERVAL.start, INTERVAL.end)) as u8;
+        let b_byte: u8 = (256_f64 * b.clamp(INTERVAL.start, INTERVAL.end)) as u8;
 
         // Just panic if anything breaks
         writeln!(out, "{r_byte} {g_byte} {b_byte}").unwrap();
