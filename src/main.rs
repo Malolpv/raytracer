@@ -3,7 +3,7 @@ use std::fs::{File, OpenOptions};
 use crate::{
     camera::{Camera, CameraConfig},
     scene::Scene,
-    world::World,
+    world::{MockWorld, World},
 };
 
 mod camera;
@@ -27,7 +27,7 @@ fn main() {
     // let mut out = std::io::stdout();
     let mut out = setup();
 
-    let mut scene = Scene::new(camera, World::get_mock_world());
+    let mut scene = Scene::new(camera, MockWorld::get_mock_world(MockWorld::OneSphere));
 
     // Time benchmark
     let start = Instant::now();
