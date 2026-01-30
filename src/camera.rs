@@ -125,13 +125,15 @@ impl Camera {
     }
 
     fn ray_color(ray: &Ray, depth: u8, world: &World) -> Color {
-        // Check for depth to stop recursivity and
+        // If ray bounce limit is exceeded, no more light is gathered.
         if depth == 0 {
             return Color::white();
         }
 
         if let Some(hit) = world.hit(ray, 0.001..=f64::MAX) {
-            let direction: Vec3 = Vec3::random_on_hemisphere(&hit.normal());
+            // Randomly generate a vector according to the Lambertian Distribution
+            let direction: Vec3 = hit.normal() + Vec3::random_on_hemisphere(&hit.normal());
+
             return Self::ray_color(&Ray::new(hit.position(), direction), depth - 1, world) * 0.5;
         }
 
