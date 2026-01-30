@@ -14,6 +14,14 @@ impl Color {
         Self { r, g, b }
     }
 
+    pub fn white() -> Self {
+        Self {
+            r: 0_f64,
+            g: 0_f64,
+            b: 0_f64,
+        }
+    }
+
     pub fn write(out: &mut impl Write, pixel_color: &Color) {
         // Translate the [0,1] component values to the byte range [0,255].
         const INTERVAL: ops::Range<f64> = 0_f64..0.999;
