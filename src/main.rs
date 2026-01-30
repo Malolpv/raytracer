@@ -18,7 +18,7 @@ mod world;
 use std::time::Instant;
 
 fn main() {
-    let config: CameraConfig = CameraConfig::new(16.0 / 9.0, 800, 1.0);
+    let config: CameraConfig = CameraConfig::new(16.0 / 9.0, 400, 1.0, 100, 50);
 
     eprintln!("Camera configuration: {:?}", config);
 

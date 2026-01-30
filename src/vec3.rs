@@ -50,6 +50,27 @@ impl Vec3 {
             random_f64_in(range),
         )
     }
+
+    pub fn random_unit_vector() -> Vec3 {
+        loop {
+            let p = Self::random();
+            let len_sq = p.length_squared();
+            if 1e-160 < len_sq && len_sq <= 1_f64 {
+                return p / len_sq.sqrt();
+            }
+        }
+    }
+
+    pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
+        let on_unit_sphere = Self::random_unit_vector();
+
+        if Self::dot(&on_unit_sphere, normal) > 0_f64 {
+            // In the same hemisphere as the normal
+            on_unit_sphere
+        } else {
+            -on_unit_sphere
+        }
+    }
 }
 
 impl ops::Add for Vec3 {
