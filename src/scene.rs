@@ -15,7 +15,7 @@ impl Scene {
 
     pub fn render(&mut self, out: impl std::io::Write) {
         eprintln!("Starting Rendering");
-        self.camera.render(out, &self.world);
+        self.camera.parallel_render(out, &self.world);
         eprintln!("Rendering complete");
     }
 }

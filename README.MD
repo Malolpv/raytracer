@@ -25,16 +25,12 @@ The project follows a modular design to ensure clarity and performance:
 * **Camera System**: Handles the mapping of the image grid to the 3D viewport, focal length, and ray generation.
 * **Geometry Management**: A `World` container that manages scene objects and implements efficient hit-detection loops.
 * **Primitive Intersections**: Optimized ray-sphere intersection logic using the quadratic formula and discriminant analysis.
-
-### Coming soon
 * **Parallelism**: Support for multi-threaded rendering across scanlines using the `Rayon` crate.
 
 ## Technical Details
 
 * **PPM Output**: Images are generated with a standard P3 header and 8-bit color depth per channel.
 * **Aspect Ratio Management**: Dynamic calculation of viewport dimensions based on the actual pixel grid to prevent geometric distortion.
-
-### Coming soon
 * **Memory Safety**: Utilizes Rust's ownership model to safely share scene data across multiple threads during the rendering phase.
 
 ## Project Structure
@@ -79,7 +75,7 @@ cargo run --release
 
 By default this renderer produces an ``img.ppm`` file in the project directory. You can configure this by editing the ``out`` variable in ``main.rs`` (``out`` must implement ``std::io::Write``).
 
-Then you can use anytool that supports the ppm format (FFmepg, ImageMagick, Gimp ...) to actually view the image.
+Then you can use anytool that supports the ppm format like [Gimp](https://www.gimp.org/downloads/) to actually view the image.
 
 ## Acknowledgments
 
