@@ -1,3 +1,5 @@
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
+
 use crate::components::Hitable;
 use crate::utils::random_f64;
 use crate::world::World;
@@ -120,6 +122,38 @@ impl Camera {
                 }
 
                 Color::write(&mut out, &(pixel_color * self.pixel_sample_scale));
+            }
+        }
+    }
+
+    pub fn parallel_render(&self, mut out: impl std::io::Write, world: &World) {
+        // Computing each pixels colors in parrallel execution
+        let image_data: Vec<Vec<Color>> = (0..self.image_height)
+            .into_par_iter()
+            .map(|j| {
+                (0..self.image_width)
+                    .map(|i| {
+                        // Initialize a blank pixel
+                        let mut pixel_color: Color = Color::white();
+
+                        // Adding each sample color value into pixel
+                        for _sample in 0..self.samples_per_pixel {
+                            let ray: Ray = self.get_ray(i, j);
+                            pixel_color += Self::ray_color(&ray, self.max_depth, world);
+                        }
+
+                        // Compute average color with the number of sample analyzed
+                        pixel_color * self.pixel_sample_scale
+                    })
+                    .collect()
+            })
+            .collect();
+
+        // Writing to ouput file single thread because File IO operation is slower when multithreaded
+        writeln!(out, "P3\n{} {}\n255", self.image_width, self.image_height).unwrap();
+        for row in image_data {
+            for pixel in row {
+                Color::write(&mut out, &pixel);
             }
         }
     }
