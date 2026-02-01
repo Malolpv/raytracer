@@ -1,0 +1,72 @@
+{
+    "camera": {
+        "aspect_ratio" : {
+            "width": 16,
+            "height": 9
+        },
+        "image_width": 1080,
+        "focal_length": 1.0,
+        "max_depth": 50,
+        "samples_per_pixel": 100
+    },
+    "world": {
+        "objects": [
+            {
+                "type": "Sphere",
+                "position": {
+                    "x": -0.5,
+                    "y": 0.0,
+                    "z": -1.0
+                },
+                "radius": 0.25,
+                "color": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                }
+            },
+            {
+                "type": "Sphere",
+                "position": {
+                    "x": 0.5,
+                    "y": 0.0,
+                    "z": -1.0
+                },
+                "radius": 0.5,
+                "color": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                }
+            }
+            ,{
+                "type": "Sphere",
+                "position": {
+                    "x": 0.0,
+                    "y": -100.5,
+                    "z": -1.0
+                },
+                "radius": 100,
+                "color": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                }
+            },{
+                "type": "Sphere",
+                "position": {
+                    "x": 0.0,
+                    "y": 0.5,
+                    "z": -2.0
+                },
+                "radius": 0.25,
+                "color": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                }
+            }
+        ]
+    }
+}
+

@@ -1,17 +1,17 @@
 use std::{
     fs::{File, OpenOptions},
     io::BufWriter,
+    path::PathBuf,
 };
 
-use crate::{
-    camera::{Camera, CameraConfig},
-    scene::Scene,
-    world::MockWorld,
-};
+use clap::Parser;
+
+use crate::config::SceneLoader;
 
 mod camera;
 mod color;
 mod components;
+mod config;
 mod ray;
 mod scene;
 mod utils;
@@ -21,30 +21,31 @@ mod world;
 use std::time::Instant;
 
 fn main() {
-    let available_threads = std::thread::available_parallelism().unwrap();
-    eprintln!("{}", available_threads);
-    let config: CameraConfig = CameraConfig::new(16.0 / 9.0, 3840, 1.0, 100, 50);
+    let args = config::Args::parse();
 
-    eprintln!("Camera configuration: {:?}", config);
+    let scene_conf_path: PathBuf = args.world;
 
-    let camera: Camera = Camera::new(config);
-
-    // let mut out = std::io::stdout();
-    let mut out = setup_buf();
-
-    let mut scene = Scene::new(
-        camera,
-        MockWorld::get_mock_world(MockWorld::BigAndSmallSpheres),
+    eprintln!(
+        "Trying to load scene config from : {}",
+        scene_conf_path.display()
     );
 
-    // Time benchmark
-    let start = Instant::now();
+    match SceneLoader::from_json::<PathBuf>(scene_conf_path) {
+        Ok(mut scene) => {
+            // Time benchmark
+            let start = Instant::now();
 
-    scene.render(&mut out);
+            // Setup the output writer and start rendering
+            scene.render(&mut setup_buf());
 
-    let elapsed = start.elapsed();
+            let elapsed = start.elapsed();
 
-    eprintln!("Render took : {:?}", elapsed);
+            eprintln!("Render took : {:?}", elapsed);
+        }
+        Err(e) => {
+            eprintln!("An error occured while loading scene : {}", e)
+        }
+    }
 }
 
 fn setup() -> File {
@@ -58,6 +59,7 @@ fn setup() -> File {
     file
 }
 
+/// Setup an output buffer
 fn setup_buf() -> BufWriter<File> {
     // Create a 1MO buf writer
     BufWriter::with_capacity(1024 * 1024, setup())
