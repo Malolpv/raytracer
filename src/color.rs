@@ -139,7 +139,7 @@ impl WriteableColor {
         Self { r, b, g }
     }
 
-    pub fn from(mut pixel_color: &Color) -> Self {
+    pub fn from(pixel_color: &Color) -> Self {
         // Translate the [0,1] component values to the byte range [0,255].
         const INTERVAL: ops::Range<f64> = 0_f64..0.999;
 

@@ -1,6 +1,6 @@
 pub mod sphere;
 
-use std::ops::{Range, RangeInclusive};
+use std::ops::RangeInclusive;
 
 use serde::Deserialize;
 pub use sphere::Sphere;
