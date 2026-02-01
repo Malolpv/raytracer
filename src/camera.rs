@@ -110,6 +110,8 @@ impl Camera {
         }
     }
 
+    // keeping this function for benchmark purposes
+    #[allow(dead_code)]
     pub fn render(&self, mut out: impl std::io::Write, world: &World) {
         writeln!(out, "P3\n{} {}\n255", self.image_width, self.image_height).unwrap();
         for j in 0..self.image_height {
@@ -127,6 +129,8 @@ impl Camera {
         }
     }
 
+    // Keeping this function for benchmarks purpose
+    #[allow(dead_code)]
     pub fn parallel_render(&self, mut out: impl std::io::Write, world: &World) {
         // Computing each pixels colors in parrallel execution
         let image_data: Vec<Vec<Color>> = (0..self.image_height)

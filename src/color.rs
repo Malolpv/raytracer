@@ -32,6 +32,8 @@ impl Color {
         0_f64
     }
 
+    // Keeping this function, to plan for ppm P6 integration
+    #[allow(dead_code)]
     pub fn as_u8_array(pixel_color: &Color) -> [u8; 3] {
         // Translate the [0,1] component values to the byte range [0,255].
         const INTERVAL: ops::Range<f64> = 0_f64..0.999;
