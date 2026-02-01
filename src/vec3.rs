@@ -1,8 +1,10 @@
 use std::ops::{self, Range};
 
+use serde::Deserialize;
+
 use crate::utils::{random_f64, random_f64_in};
 
-#[derive(Default, Debug, PartialEq, Clone, Copy)]
+#[derive(Default, Debug, PartialEq, Clone, Copy, Deserialize)]
 pub struct Vec3 {
     x: f64,
     y: f64,
