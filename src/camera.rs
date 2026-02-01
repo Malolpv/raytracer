@@ -1,4 +1,5 @@
 use rayon::prelude::*;
+use serde::Deserialize;
 
 use crate::components::Hitable;
 use crate::utils::random_f64;
@@ -9,11 +10,11 @@ use crate::{
     vec3::{Point3, Vec3},
 };
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub struct CameraConfig {
     aspect_ratio: f64,
     image_width: usize,
-    focal_lenght: f64,
+    focal_length: f64,
     max_depth: u8,
     samples_per_pixel: usize,
 }
@@ -22,14 +23,14 @@ impl CameraConfig {
     pub fn new(
         aspect_ratio: f64,
         image_width: usize,
-        focal_lenght: f64,
+        focal_length: f64,
         samples_per_pixel: usize,
         max_depth: u8,
     ) -> Self {
         Self {
             aspect_ratio,
             image_width,
-            focal_lenght,
+            focal_length,
             max_depth,
             samples_per_pixel,
         }
@@ -89,7 +90,7 @@ impl Camera {
         let camera_center: Point3 = Point3::new(0_f64, 0_f64, 0_f64);
 
         let viewport_upper_left_pixel = camera_center
-            - Vec3::new(0_f64, 0_f64, config.focal_lenght)
+            - Vec3::new(0_f64, 0_f64, config.focal_length)
             - viewport_h / 2_f64
             - viewport_v / 2_f64;
 
@@ -176,6 +177,8 @@ impl Camera {
                 WriteableColor::from(&(pixel_color * self.pixel_sample_scale))
             })
             .collect();
+
+        eprintln!("Finalized rendering computation. Writing to output...");
 
         // Writing to ouput file in a single thread because File IO operation is slower when multithreaded
         // PPM file header

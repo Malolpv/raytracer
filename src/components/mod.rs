@@ -2,6 +2,7 @@ pub mod sphere;
 
 use std::ops::{Range, RangeInclusive};
 
+use serde::Deserialize;
 pub use sphere::Sphere;
 
 use crate::{ray::Ray, vec3::Point3, vec3::Vec3};
@@ -54,6 +55,8 @@ pub trait Hitable {
     fn hit(&self, ray: &Ray, t_range: RangeInclusive<f64>) -> Option<HitRecord>;
 }
 
+#[derive(Deserialize)]
+#[serde(tag = "type")]
 pub enum Component {
     Sphere(Sphere),
     // Triangle(Triangle),
