@@ -1,9 +1,12 @@
-use std::fs::{File, OpenOptions};
+use std::{
+    fs::{File, OpenOptions},
+    io::BufWriter,
+};
 
 use crate::{
     camera::{Camera, CameraConfig},
     scene::Scene,
-    world::{MockWorld, World},
+    world::MockWorld,
 };
 
 mod camera;
@@ -18,16 +21,21 @@ mod world;
 use std::time::Instant;
 
 fn main() {
-    let config: CameraConfig = CameraConfig::new(16.0 / 9.0, 400, 1.0, 100, 50);
+    let available_threads = std::thread::available_parallelism().unwrap();
+    eprintln!("{}", available_threads);
+    let config: CameraConfig = CameraConfig::new(16.0 / 9.0, 3840, 1.0, 100, 50);
 
     eprintln!("Camera configuration: {:?}", config);
 
     let camera: Camera = Camera::new(config);
 
     // let mut out = std::io::stdout();
-    let mut out = setup();
+    let mut out = setup_buf();
 
-    let mut scene = Scene::new(camera, MockWorld::get_mock_world(MockWorld::OneSphere));
+    let mut scene = Scene::new(
+        camera,
+        MockWorld::get_mock_world(MockWorld::BigAndSmallSpheres),
+    );
 
     // Time benchmark
     let start = Instant::now();
@@ -48,4 +56,9 @@ fn setup() -> File {
         .unwrap();
 
     file
+}
+
+fn setup_buf() -> BufWriter<File> {
+    // Create a 1MO buf writer
+    BufWriter::with_capacity(1024 * 1024, setup())
 }

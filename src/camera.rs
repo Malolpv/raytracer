@@ -1,10 +1,10 @@
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use rayon::prelude::*;
 
 use crate::components::Hitable;
 use crate::utils::random_f64;
 use crate::world::World;
 use crate::{
-    color::Color,
+    color::{Color, WriteableColor},
     ray::Ray,
     vec3::{Point3, Vec3},
 };
@@ -149,12 +149,41 @@ impl Camera {
             })
             .collect();
 
-        // Writing to ouput file single thread because File IO operation is slower when multithreaded
+        // Writing to ouput file in a single thread because File IO operation is slower when multithreaded
         writeln!(out, "P3\n{} {}\n255", self.image_width, self.image_height).unwrap();
         for row in image_data {
             for pixel in row {
                 Color::write(&mut out, &pixel);
             }
+        }
+    }
+
+    /// Compute each pixels colors in parrallel
+    /// Then write to given output
+    pub fn optimized_parallel_render(&self, mut out: impl std::io::Write, world: &World) {
+        // flatten the list to benefits from CPU prefetching
+        let pixels: Vec<WriteableColor> = (0..self.image_height * self.image_width)
+            .into_par_iter()
+            .map(|index| {
+                let i = index % self.image_width;
+                let j = index / self.image_width;
+
+                let mut pixel_color = Color::white();
+                for _ in 0..self.samples_per_pixel {
+                    let ray = self.get_ray(i, j);
+                    pixel_color += Self::ray_color(&ray, self.max_depth, world);
+                }
+                WriteableColor::from(&(pixel_color * self.pixel_sample_scale))
+            })
+            .collect();
+
+        // Writing to ouput file in a single thread because File IO operation is slower when multithreaded
+        // PPM file header
+        writeln!(out, "P3\n{} {}\n255", self.image_width, self.image_height).unwrap();
+
+        for pixel in pixels {
+            // Writing to output, panic if something wrong happens
+            writeln!(&mut out, "{} {} {}", pixel.r(), pixel.g(), pixel.b()).unwrap();
         }
     }
 
