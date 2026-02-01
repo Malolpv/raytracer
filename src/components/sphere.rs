@@ -1,5 +1,7 @@
 use std::ops::{Range, RangeInclusive};
 
+use serde::Deserialize;
+
 use crate::{
     color::Color,
     components::Hitable,
@@ -7,6 +9,7 @@ use crate::{
     vec3::{Point3, Vec3},
 };
 
+#[derive(Deserialize)]
 pub struct Sphere {
     radius: f64,
     position: Point3,
