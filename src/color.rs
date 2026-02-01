@@ -1,8 +1,10 @@
 use std::{io::Write, ops};
 
+use serde::Deserialize;
+
 use crate::vec3::Vec3;
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Deserialize)]
 pub struct Color {
     r: f64,
     g: f64,
