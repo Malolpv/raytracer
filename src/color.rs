@@ -30,6 +30,23 @@ impl Color {
         0_f64
     }
 
+    pub fn as_u8_array(pixel_color: &Color) -> [u8; 3] {
+        // Translate the [0,1] component values to the byte range [0,255].
+        const INTERVAL: ops::Range<f64> = 0_f64..0.999;
+
+        // Applying gamma correction in order to have a consistent ramp from darkness to lightness
+        let r = Self::linear_to_gamma(pixel_color.r);
+        let g = Self::linear_to_gamma(pixel_color.g);
+        let b = Self::linear_to_gamma(pixel_color.b);
+
+        // convert to 8 bits values
+        let r_byte: u8 = (256_f64 * r.clamp(INTERVAL.start, INTERVAL.end)) as u8;
+        let g_byte: u8 = (256_f64 * g.clamp(INTERVAL.start, INTERVAL.end)) as u8;
+        let b_byte: u8 = (256_f64 * b.clamp(INTERVAL.start, INTERVAL.end)) as u8;
+
+        [r_byte, g_byte, b_byte]
+    }
+
     pub fn write(out: &mut impl Write, pixel_color: &Color) {
         // Translate the [0,1] component values to the byte range [0,255].
         const INTERVAL: ops::Range<f64> = 0_f64..0.999;
@@ -94,5 +111,46 @@ impl ops::Mul<f64> for Color {
 
     fn mul(self, rhs: f64) -> Self::Output {
         Color::new(self.r * rhs, self.g * rhs, self.b * rhs)
+    }
+}
+
+pub struct WriteableColor {
+    r: u8,
+    g: u8,
+    b: u8,
+}
+
+impl WriteableColor {
+    pub fn r(&self) -> u8 {
+        self.r
+    }
+
+    pub fn g(&self) -> u8 {
+        self.g
+    }
+
+    pub fn b(&self) -> u8 {
+        self.b
+    }
+
+    fn new(r: u8, g: u8, b: u8) -> Self {
+        Self { r, b, g }
+    }
+
+    pub fn from(mut pixel_color: &Color) -> Self {
+        // Translate the [0,1] component values to the byte range [0,255].
+        const INTERVAL: ops::Range<f64> = 0_f64..0.999;
+
+        // Applying gamma correction in order to have a consistent ramp from darkness to lightness
+        let r = Color::linear_to_gamma(pixel_color.r);
+        let g = Color::linear_to_gamma(pixel_color.g);
+        let b = Color::linear_to_gamma(pixel_color.b);
+
+        // convert to 8 bits values
+        Self::new(
+            (256_f64 * r.clamp(INTERVAL.start, INTERVAL.end)) as u8,
+            (256_f64 * g.clamp(INTERVAL.start, INTERVAL.end)) as u8,
+            (256_f64 * b.clamp(INTERVAL.start, INTERVAL.end)) as u8,
+        )
     }
 }
