@@ -83,6 +83,15 @@ impl Vec3 {
     pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
         v - (n * 2.0 * Self::dot(&v, &n))
     }
+
+    pub fn refract(uv: Vec3, n: Vec3, etai_over_etat: f64) -> Self {
+        let cos_theta = Self::dot(&uv, &n).min(1_f64);
+
+        let r_out_perpendicular: Vec3 = (n * cos_theta + uv) * etai_over_etat;
+        let r_out_parallel: Vec3 = n * -(1_f64 - r_out_perpendicular.length_squared()).abs().sqrt();
+
+        r_out_parallel + r_out_perpendicular
+    }
 }
 
 impl ops::Add for Vec3 {
