@@ -85,7 +85,8 @@ impl Vec3 {
     }
 
     pub fn refract(uv: Vec3, n: Vec3, etai_over_etat: f64) -> Self {
-        let cos_theta = Self::dot(&uv, &n).min(1_f64);
+        // We need to invert uv because of refraction
+        let cos_theta = Self::dot(&(uv * -1f64), &n).min(1_f64);
 
         let r_out_perpendicular: Vec3 = (n * cos_theta + uv) * etai_over_etat;
         let r_out_parallel: Vec3 = n * -(1_f64 - r_out_perpendicular.length_squared()).abs().sqrt();
