@@ -58,12 +58,32 @@ impl CameraJsonConfig {
     }
 }
 
+// This struct allows to specify the refraction index as a fraction
+#[derive(serde::Deserialize)]
+/// Wrapper to represent a refraction index
+///
+/// To render glass in the air :
+///
+/// material_ri => refraction index of glass (1.5)
+///
+/// enclosing_ri => refraction index of air (1.0)
+struct RefractionIndex {
+    material_ri: f64,
+    enclosing_ri: f64,
+}
+
+impl RefractionIndex {
+    fn to_f64(&self) -> f64 {
+        self.material_ri / self.enclosing_ri
+    }
+}
+
 #[derive(Deserialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
-pub enum MaterialConfig {
+enum MaterialConfig {
     Lambertian { albedo: Color },
     Metal { albedo: Color, fuzz: f64 },
-    Dielectrics { refraction_index: f64 },
+    Dielectrics { refraction_index: RefractionIndex },
 }
 
 impl MaterialConfig {
@@ -72,7 +92,9 @@ impl MaterialConfig {
         match self {
             MaterialConfig::Lambertian { albedo } => Arc::new(Lambertian::new(albedo)),
             MaterialConfig::Metal { albedo, fuzz } => Arc::new(Metal::new(albedo, fuzz)),
-            Self::Dielectrics { refraction_index } => Arc::new(Dielectrics::new(refraction_index)),
+            Self::Dielectrics { refraction_index } => {
+                Arc::new(Dielectrics::new(refraction_index.to_f64()))
+            }
         }
     }
 }

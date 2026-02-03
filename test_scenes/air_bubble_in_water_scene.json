@@ -57,9 +57,9 @@
                 "material": {
                     "type": "dielectrics",
                     "refraction_index": {
-                        "material_ri": 1.5,
-                        "enclosing_ri": 1.00
-                    } 
+                        "material_ri": 1.00,
+                        "enclosing_ri": 1.33
+                    }
                 }
             },
             {
