@@ -39,6 +39,10 @@ impl HitRecord {
         tmp
     }
 
+    pub fn front_face(&self) -> bool {
+        self.front_face
+    }
+
     pub fn position(&self) -> Point3 {
         self.position
     }
