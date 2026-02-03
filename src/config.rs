@@ -10,7 +10,7 @@ use crate::{
     camera::{Camera, CameraConfig},
     color::Color,
     components::{Component, Sphere},
-    materials::{lambertian::Lambertian, metal::Metal, Material},
+    materials::{dielectrics::Dielectrics, lambertian::Lambertian, metal::Metal, Material},
     scene::Scene,
     vec3::Point3,
     world::World,
@@ -63,6 +63,7 @@ impl CameraJsonConfig {
 pub enum MaterialConfig {
     Lambertian { albedo: Color },
     Metal { albedo: Color, fuzz: f64 },
+    Dielectrics { refraction_index: f64 },
 }
 
 impl MaterialConfig {
@@ -71,6 +72,7 @@ impl MaterialConfig {
         match self {
             MaterialConfig::Lambertian { albedo } => Arc::new(Lambertian::new(albedo)),
             MaterialConfig::Metal { albedo, fuzz } => Arc::new(Metal::new(albedo, fuzz)),
+            Self::Dielectrics { refraction_index } => Arc::new(Dielectrics::new(refraction_index)),
         }
     }
 }
