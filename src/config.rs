@@ -62,15 +62,15 @@ impl CameraJsonConfig {
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum MaterialConfig {
     Lambertian { albedo: Color },
-    Metal { albedo: Color },
+    Metal { albedo: Color, fuzz: f64 },
 }
 
 impl MaterialConfig {
-    /// La méthode magique qui transforme la config en objet thread-safe
+    /// Converts config to an actual material
     pub fn build(self) -> Arc<dyn Material> {
         match self {
             MaterialConfig::Lambertian { albedo } => Arc::new(Lambertian::new(albedo)),
-            MaterialConfig::Metal { albedo } => Arc::new(Metal::new(albedo)),
+            MaterialConfig::Metal { albedo, fuzz } => Arc::new(Metal::new(albedo, fuzz)),
         }
     }
 }
@@ -79,7 +79,7 @@ impl MaterialConfig {
 pub struct SphereConfig {
     position: Point3,
     radius: f64,
-    material: MaterialConfig, // On lit la config ici
+    material: MaterialConfig,
 }
 
 #[derive(Deserialize)]
