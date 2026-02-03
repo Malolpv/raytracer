@@ -201,12 +201,17 @@ impl Camera {
         }
 
         if let Some(hit) = world.hit(ray, 0.001..=f64::MAX) {
+            if let Some((scattered, attenuation)) = hit.material().scatter(ray, &hit) {
+                return attenuation * Self::ray_color(&scattered, depth - 1, world);
+            }
+            return Color::white();
+
             // Randomly generate a vector according to the Lambertian Distribution
-            let direction: Vec3 = hit.normal() + Vec3::random_on_hemisphere(&hit.normal());
+            // let direction: Vec3 = hit.normal() + Vec3::random_on_hemisphere(&hit.normal());
 
             // here the float number represent the gamut applied to the ray color
             // lower -> darker, higher -> clearer
-            return Self::ray_color(&Ray::new(hit.position(), direction), depth - 1, world) * 0.5;
+            // return Self::ray_color(&Ray::new(hit.position(), direction), depth - 1, world) * 0.5;
         }
 
         let unit_direction: Vec3 = Vec3::unit_vector(&ray.direction());

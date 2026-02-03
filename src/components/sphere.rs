@@ -1,27 +1,24 @@
-use std::ops::RangeInclusive;
-
-use serde::Deserialize;
+use std::{ops::RangeInclusive, sync::Arc};
 
 use crate::{
-    color::Color,
     components::Hitable,
+    materials::Material,
     ray::Ray,
     vec3::{Point3, Vec3},
 };
 
-#[derive(Deserialize)]
 pub struct Sphere {
     radius: f64,
     position: Point3,
-    color: Color,
+    material: Arc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(position: Point3, radius: f64, color: Color) -> Self {
+    pub fn new(position: Point3, radius: f64, material: Arc<dyn Material>) -> Self {
         Sphere {
             radius,
             position,
-            color,
+            material,
         }
     }
 
@@ -31,10 +28,6 @@ impl Sphere {
 
     pub fn position(&self) -> &Point3 {
         &self.position
-    }
-
-    pub fn color(&self) -> Color {
-        self.color
     }
 }
 
@@ -66,6 +59,12 @@ impl Hitable for Sphere {
         let p = ray.at(t);
         let normal = (p - self.position) / self.radius;
 
-        Some(super::HitRecord::new(p, normal, t, ray))
+        Some(super::HitRecord::new(
+            p,
+            normal,
+            t,
+            ray,
+            self.material.clone(),
+        ))
     }
 }

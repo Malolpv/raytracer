@@ -1,26 +1,38 @@
 pub mod sphere;
 
-use std::ops::RangeInclusive;
+use std::{ops::RangeInclusive, sync::Arc};
 
 use serde::Deserialize;
 pub use sphere::Sphere;
 
-use crate::{ray::Ray, vec3::Point3, vec3::Vec3};
+use crate::{
+    materials::Material,
+    ray::Ray,
+    vec3::{Point3, Vec3},
+};
 
 pub struct HitRecord {
     position: Point3,
     normal: Vec3,
     t: f64,
     front_face: bool,
+    material: Arc<dyn Material>,
 }
 
 impl HitRecord {
-    pub fn new(position: Point3, normal: Vec3, t: f64, ray: &Ray) -> Self {
+    pub fn new(
+        position: Point3,
+        normal: Vec3,
+        t: f64,
+        ray: &Ray,
+        material: Arc<dyn Material>,
+    ) -> Self {
         let mut tmp = Self {
             position,
             normal,
             t,
             front_face: false,
+            material,
         };
 
         tmp.set_face_normal(ray, &normal);
@@ -36,6 +48,10 @@ impl HitRecord {
 
     pub fn t(&self) -> f64 {
         self.t
+    }
+
+    pub fn material(&self) -> &Arc<dyn Material> {
+        &self.material
     }
 
     //TODO Maybe refactor this to use self.normal instead of outward_normal
@@ -55,8 +71,8 @@ pub trait Hitable {
     fn hit(&self, ray: &Ray, t_range: RangeInclusive<f64>) -> Option<HitRecord>;
 }
 
-#[derive(Deserialize)]
-#[serde(tag = "type")]
+// #[derive(Deserialize)]
+// #[serde(tag = "type")]
 pub enum Component {
     Sphere(Sphere),
     // Triangle(Triangle),

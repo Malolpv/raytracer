@@ -12,6 +12,7 @@ mod camera;
 mod color;
 mod components;
 mod config;
+mod materials;
 mod ray;
 mod scene;
 mod utils;

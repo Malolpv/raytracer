@@ -1,12 +1,18 @@
-use std::path::{Path, PathBuf};
+use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 
 use clap::{Parser, ValueHint};
 use serde::Deserialize;
 
 use crate::{
     camera::{Camera, CameraConfig},
-    components::Component,
+    color::Color,
+    components::{Component, Sphere},
+    materials::{lambertian::Lambertian, metal::Metal, Material},
     scene::Scene,
+    vec3::Point3,
     world::World,
 };
 
@@ -53,15 +59,50 @@ impl CameraJsonConfig {
 }
 
 #[derive(Deserialize)]
+#[serde(tag = "type", rename_all = "lowercase")]
+pub enum MaterialConfig {
+    Lambertian { albedo: Color },
+    Metal { albedo: Color },
+}
+
+impl MaterialConfig {
+    /// La méthode magique qui transforme la config en objet thread-safe
+    pub fn build(self) -> Arc<dyn Material> {
+        match self {
+            MaterialConfig::Lambertian { albedo } => Arc::new(Lambertian::new(albedo)),
+            MaterialConfig::Metal { albedo } => Arc::new(Metal::new(albedo)),
+        }
+    }
+}
+
+#[derive(Deserialize)]
+pub struct SphereConfig {
+    position: Point3,
+    radius: f64,
+    material: MaterialConfig, // On lit la config ici
+}
+
+#[derive(Deserialize)]
+#[serde(tag = "type")]
+pub enum ComponentConfig {
+    Sphere(SphereConfig),
+}
+
+#[derive(Deserialize)]
 struct WorldConfig {
-    objects: Vec<Component>,
+    objects: Vec<ComponentConfig>,
 }
 
 impl WorldConfig {
     fn into_world(self) -> World {
         let mut world = World::new();
         for object in self.objects {
-            world.add(object);
+            match object {
+                ComponentConfig::Sphere(s) => {
+                    let mat = s.material.build();
+                    world.add(Component::Sphere(Sphere::new(s.position, s.radius, mat)));
+                }
+            }
         }
         world
     }
