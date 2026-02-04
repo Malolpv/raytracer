@@ -12,7 +12,7 @@ use crate::{
     components::{Component, Sphere},
     materials::{dielectrics::Dielectrics, lambertian::Lambertian, metal::Metal, Material},
     scene::Scene,
-    vec3::Point3,
+    vec3::{Point3, Vec3},
     world::World,
 };
 
@@ -41,10 +41,12 @@ impl AspectRatio {
 struct CameraJsonConfig {
     aspect_ratio: AspectRatio,
     image_width: usize,
-    focal_length: f64,
     max_depth: u8,
     samples_per_pixel: usize,
     vfov: f64,
+    look_from: Point3,
+    look_at: Point3,
+    vup: Vec3,
 }
 
 impl CameraJsonConfig {
@@ -52,10 +54,12 @@ impl CameraJsonConfig {
         Camera::new(CameraConfig::new(
             self.aspect_ratio.to_f64(),
             self.image_width,
-            self.focal_length,
             self.samples_per_pixel,
             self.max_depth,
             self.vfov,
+            self.look_from,
+            self.look_at,
+            self.vup,
         ))
     }
 }
