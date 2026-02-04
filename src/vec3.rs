@@ -93,6 +93,19 @@ impl Vec3 {
 
         r_out_parallel + r_out_perpendicular
     }
+
+    pub fn random_in_unit_disk() -> Self {
+        loop {
+            let p = Self::new(
+                random_f64_in(-1_f64..1_f64),
+                random_f64_in(-1_f64..1_f64),
+                0_f64,
+            );
+            if p.length_squared() < 1_f64 {
+                return p;
+            }
+        }
+    }
 }
 
 impl ops::Add for Vec3 {
