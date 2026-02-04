@@ -1,8 +1,11 @@
-use std::{io::Write, ops};
+use std::{
+    io::Write,
+    ops::{self, Range},
+};
 
 use serde::Deserialize;
 
-use crate::vec3::Vec3;
+use crate::{utils::random_f64, utils::random_f64_in, vec3::Vec3};
 
 #[derive(Debug, Default, Clone, Copy, Deserialize)]
 pub struct Color {
@@ -67,6 +70,20 @@ impl Color {
 
         // Just panic if anything breaks
         writeln!(out, "{r_byte} {g_byte} {b_byte}").unwrap();
+    }
+
+    /// Instanciate a new color with random values in range (0, 1]
+    pub fn random() -> Self {
+        Self::new(random_f64(), random_f64(), random_f64())
+    }
+
+    /// Instanciate a new color with random values in given range
+    pub fn random_from_range(range: Range<f64>) -> Self {
+        Self::new(
+            random_f64_in(range.clone()),
+            random_f64_in(range.clone()),
+            random_f64_in(range),
+        )
     }
 }
 
