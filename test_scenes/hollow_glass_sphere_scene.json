@@ -7,7 +7,8 @@
         "image_width": 1080,
         "focal_length": 1.0,
         "max_depth": 50,
-        "samples_per_pixel": 100
+        "samples_per_pixel": 100,
+        "vfov": 90.0
     },
     "world": {
         "objects": [

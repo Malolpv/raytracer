@@ -44,6 +44,7 @@ struct CameraJsonConfig {
     focal_length: f64,
     max_depth: u8,
     samples_per_pixel: usize,
+    vfov: f64,
 }
 
 impl CameraJsonConfig {
@@ -54,6 +55,7 @@ impl CameraJsonConfig {
             self.focal_length,
             self.samples_per_pixel,
             self.max_depth,
+            self.vfov,
         ))
     }
 }
