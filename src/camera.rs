@@ -14,28 +14,34 @@ use crate::{
 pub struct CameraConfig {
     aspect_ratio: f64,
     image_width: usize,
-    focal_length: f64,
     max_depth: u8,
     samples_per_pixel: usize,
     vfov: f64,
+    look_from: Point3,
+    look_at: Point3,
+    vup: Vec3,
 }
 
 impl CameraConfig {
     pub fn new(
         aspect_ratio: f64,
         image_width: usize,
-        focal_length: f64,
         samples_per_pixel: usize,
         max_depth: u8,
         vfov: f64,
+        look_from: Point3,
+        look_at: Point3,
+        vup: Vec3,
     ) -> Self {
         Self {
             aspect_ratio,
             image_width,
-            focal_length,
             max_depth,
             samples_per_pixel,
             vfov,
+            look_from,
+            look_at,
+            vup,
         }
     }
 }
@@ -50,17 +56,29 @@ pub struct Camera {
 
     /// Vertical view angle (field of view)
     vfov: f64,
+    /// Point camera is looking from
+    look_from: Point3,
+    /// Point camera is looking to
+    look_at: Point3,
+    /// Camera-relative "up" direction
+    vup: Vec3,
 
     /// Count of random samples for each pixel
     samples_per_pixel: usize,
     /// Color scale factor for a sum of pixel samples
     pixel_sample_scale: f64,
     /// Offset to pixel to the right
-    pixel_delta_h: Vec3,
+    pixel_delta_u: Vec3,
     /// Offset to pixel below
     pixel_delta_v: Vec3,
     /// Location of pixel 0, 0
     pixel00_loc: Point3,
+
+    // Camera frame basis vectors
+    u: Vec3,
+    v: Vec3,
+    w: Vec3,
+
     /// Camera center
     center: Point3,
     /// Maximum number of ray bounces (smaller the depth -> darker the image)
@@ -85,23 +103,29 @@ impl Camera {
         let theta: f64 = config.vfov.to_radians();
         let h = (theta / 2_f64).tan();
 
-        let viewport_height: f64 = 2_f64 * h * config.focal_length;
+        let focal_length: f64 = (config.look_from - config.look_at).length();
+
+        let viewport_height: f64 = 2_f64 * h * focal_length;
         let viewport_width: f64 = viewport_height * actual_aspect_ratio;
 
+        // Compute the u,v,w unit basis vectors for the camera coordinate frame
+        let w = Vec3::unit_vector(&(config.look_from - config.look_at));
+        let u = Vec3::unit_vector(&Vec3::cross(&config.vup, &w));
+        let v = Vec3::cross(&w, &u);
+
         // Compute the vectors accross the horizontal and down vertical viewport edges
-        let viewport_h: Vec3 = Vec3::new(viewport_width, 0_f64, 0_f64);
-        let viewport_v: Vec3 = Vec3::new(0_f64, -viewport_height, 0_f64);
+        let viewport_u: Vec3 = u * viewport_width;
+        let viewport_v: Vec3 = -v * viewport_height;
 
         // Compute the horizontal and vertical delta vectos from pixel to pixel
-        let pixel_delta_h: Vec3 = viewport_h / config.image_width as f64;
+        let pixel_delta_h: Vec3 = viewport_u / config.image_width as f64;
         let pixel_delta_v: Vec3 = viewport_v / image_height as f64;
 
-        let camera_center: Point3 = Point3::new(0_f64, 0_f64, 0_f64);
+        let camera_center: Point3 = config.look_from;
 
-        let viewport_upper_left_pixel = camera_center
-            - Vec3::new(0_f64, 0_f64, config.focal_length)
-            - viewport_h / 2_f64
-            - viewport_v / 2_f64;
+        // Compute upper left pixel location
+        let viewport_upper_left_pixel =
+            camera_center - (w * focal_length) - viewport_u / 2_f64 - viewport_v / 2_f64;
 
         let pixel00_loc: Point3 = viewport_upper_left_pixel + (pixel_delta_h + pixel_delta_v) * 0.5;
 
@@ -109,7 +133,7 @@ impl Camera {
             aspect_ratio: config.aspect_ratio,
             image_width: config.image_width,
             image_height,
-            pixel_delta_h,
+            pixel_delta_u: pixel_delta_h,
             pixel_delta_v,
             pixel00_loc,
             center: camera_center,
@@ -117,6 +141,12 @@ impl Camera {
             samples_per_pixel: config.samples_per_pixel,
             max_depth: config.max_depth,
             vfov: config.vfov,
+            look_at: config.look_at,
+            look_from: config.look_from,
+            u,
+            v,
+            w,
+            vup: config.vup,
         }
     }
 
@@ -245,7 +275,7 @@ impl Camera {
     fn get_ray(&self, i: usize, j: usize) -> Ray {
         let offset: Vec3 = Self::sample_square();
         let pixel_sample = self.pixel00_loc
-            + (self.pixel_delta_h * (offset.x() + i as f64))
+            + (self.pixel_delta_u * (offset.x() + i as f64))
             + (self.pixel_delta_v * (j as f64 + offset.y()));
 
         let ray_origin: Point3 = self.center;
