@@ -1,4 +1,4 @@
-use crate::{color::Color, materials::Material, ray::Ray, vec3::Vec3};
+use crate::{color::Color, materials::Material, ray::Ray, utils::random_f64, vec3::Vec3};
 
 pub struct Dielectrics {
     /// Refractive index in vacuum or air, or the ratio of the material's refractive index over the refractive index of the enclosing media
@@ -36,14 +36,26 @@ impl Material for Dielectrics {
 
         let cannot_refract: bool = refraction_index * sin_theta > 1_f64;
 
-        let direction = match cannot_refract {
-            // Material cannot refract so it must reflect the ray
-            true => Vec3::reflect(unit_direction, rec.normal()),
-            false => Vec3::refract(unit_direction, rec.normal(), refraction_index),
-        };
+        let direction =
+            match cannot_refract || Self::reflectance(cos_theta, refraction_index) > random_f64() {
+                // Material cannot refract so it must reflect the ray
+                true => Vec3::reflect(unit_direction, rec.normal()),
+                false => Vec3::refract(unit_direction, rec.normal(), refraction_index),
+            };
 
         let scattered = Ray::new(rec.position(), direction);
 
         Some((scattered, attenuation))
+    }
+}
+
+impl Dielectrics {
+    /// Use Shlick's approximation for reflectance to simulate reflectivity variation with angle
+    fn reflectance(cosine: f64, refraction_index: f64) -> f64 {
+        let mut r = (1_f64 - refraction_index) / (1_f64 + refraction_index);
+
+        r = r.powi(2);
+
+        r + (1_f64 - r) * (1_f64 - cosine).powi(5)
     }
 }
