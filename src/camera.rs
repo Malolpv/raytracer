@@ -17,6 +17,7 @@ pub struct CameraConfig {
     focal_length: f64,
     max_depth: u8,
     samples_per_pixel: usize,
+    vfov: f64,
 }
 
 impl CameraConfig {
@@ -26,6 +27,7 @@ impl CameraConfig {
         focal_length: f64,
         samples_per_pixel: usize,
         max_depth: u8,
+        vfov: f64,
     ) -> Self {
         Self {
             aspect_ratio,
@@ -33,6 +35,7 @@ impl CameraConfig {
             focal_length,
             max_depth,
             samples_per_pixel,
+            vfov,
         }
     }
 }
@@ -44,6 +47,9 @@ pub struct Camera {
     image_width: usize,
     /// Rendered image height
     image_height: usize,
+
+    /// Vertical view angle (field of view)
+    vfov: f64,
 
     /// Count of random samples for each pixel
     samples_per_pixel: usize,
@@ -76,7 +82,10 @@ impl Camera {
         let actual_aspect_ratio = config.image_width as f64 / image_height as f64;
 
         // Compute viewport dimensions
-        let viewport_height: f64 = 2_f64;
+        let theta: f64 = config.vfov.to_radians();
+        let h = (theta / 2_f64).tan();
+
+        let viewport_height: f64 = 2_f64 * h * config.focal_length;
         let viewport_width: f64 = viewport_height * actual_aspect_ratio;
 
         // Compute the vectors accross the horizontal and down vertical viewport edges
@@ -107,6 +116,7 @@ impl Camera {
             pixel_sample_scale: 1.0 / config.samples_per_pixel as f64,
             samples_per_pixel: config.samples_per_pixel,
             max_depth: config.max_depth,
+            vfov: config.vfov,
         }
     }
 
