@@ -38,15 +38,22 @@ The project follows a modular design to ensure clarity and performance:
 ```text
 src/
 ├── components/
-│   ├── mod.rs      # Hitable trait and HitRecord definitions
-│   └── sphere.rs   # Sphere intersection logic
-├── camera.rs       # Viewport and ray generation
-├── color.rs        # Color utilities and PPM formatting
-├── main.rs         # Application entry point and configuration
-├── ray.rs          # Ray structure
-├── scene.rs        # High-level scene orchestration
-├── vec3.rs         # Vector mathematics
-└── world.rs        # Object collection and collision loops
+│   ├── mod.rs              # Hitable trait and HitRecord definitions
+│   └── sphere.rs           # Sphere intersection logic
+├── materials/
+│   ├── mod.rs              # Material trait
+|   ├── dielectrics.rs      # Dielectrics ray scatter logic
+|   ├── lambertian.rs       # Lambertian ray scatter logic
+│   └── metal.rs            # Metal ray scatter logic
+├── camera.rs               # Viewport and ray generation
+├── color.rs                # Color utilities and PPM formatting
+├── color.rs                # Configuration loader
+├── main.rs                 # Application entry point and configuration
+├── ray.rs                  # Ray structure
+├── scene.rs                # High-level scene orchestration
+├── utils.rs                # Utils functions
+├── vec3.rs                 # Vector mathematics
+└── world.rs                # Object collection and collision loops
 ```
 
 ## Getting Started
@@ -64,14 +71,17 @@ git clone https://github.com/Malolpv/raytracer.git
 cd raytracer
 ```
 
-2. **Build and Run in Release mode**
+2. **Define input**
+You can fully customize the scene to render with the available components and materials. To see some example scenes go to the test_scenes folder. 
+
+3. **Build and Run in Release mode**
 
 Compiling with the --release flag is highly recommended for better performances.
 ```bash
-cargo run --release
+cargo run --release ./path_to_the_scene.json
 ```
 
-3. **Visualize output**
+4. **Visualize output**
 
 By default this renderer produces an ``img.ppm`` file in the project directory. You can configure this by editing the ``out`` variable in ``main.rs`` (``out`` must implement ``std::io::Write``).
 
