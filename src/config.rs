@@ -47,6 +47,8 @@ struct CameraJsonConfig {
     look_from: Point3,
     look_at: Point3,
     vup: Vec3,
+    defocus_angle: f64,
+    focus_dist: f64,
 }
 
 impl CameraJsonConfig {
@@ -60,6 +62,8 @@ impl CameraJsonConfig {
             self.look_from,
             self.look_at,
             self.vup,
+            self.focus_dist,
+            self.defocus_angle,
         ))
     }
 }
