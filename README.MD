@@ -6,7 +6,7 @@ For further information on the original series, please visit [raytracing.github.
 
 ## Overview
 
-The engine simulates the physical behavior of light by casting rays from a virtual camera into a scene composed of geometric primitives. It calculates intersections, surface normals, and color gradients to produce 2D images in the PPM (Portable Pixmap) format.
+The engine simulates the physical behavior of light by casting rays from a virtual camera into a scene composed of geometric primitives. It calculates intersections, surface normals, and color gradients to produce 3D images in the PPM (Portable Pixmap) format.
 
 ## Goal
 
